@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Report Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        button {
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        button:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h2 class="mb-4">Teacher Report Generator</h2>
+        <form id="reportForm">
+            <label for="group">Enter the name of the student group:</label>
+            <input type="text" id="group" placeholder="Group Name" required>
+            <label for="teacher">Enter your full name:</label>
+            <input type="text" id="teacher" placeholder="Teacher's Full Name" required>
+            <label for="student">Enter the student's full name:</label>
+            <input type="text" id="student" placeholder="Student's Full Name" required>
+            <label for="level">Specify the student's English proficiency level:</label>
+            <input type="text" id="level" placeholder="English Level" required>
+
+            <h3 class="mt-3">Grades</h3>
+            <input type="number" id="grammar" placeholder="Grammar (0/100)" required>
+            <input type="number" id="vocabulary" placeholder="Vocabulary (0/100)" required>
+            <input type="number" id="reading" placeholder="Reading (0/100)" required>
+            <input type="number" id="writing" placeholder="Writing (0/100)" required>
+            <input type="number" id="speaking" placeholder="Speaking (0/100)" required>
+            <input type="number" id="listening" placeholder="Listening (0/100)" required>
+
+            <label for="comments">Provide any additional remarks:</label>
+            <textarea id="comments" placeholder="Teacher's Comments" required></textarea>
+
+            <button type="button" id="generateBtn">Generate Report</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("generateBtn").addEventListener("click", async function(event) {
+            event.preventDefault();
+
+            const data = {
+                student: document.getElementById("student").value,
+                group: document.getElementById("group").value,
+                teacher: document.getElementById("teacher").value,
+                level: document.getElementById("level").value,
+                grades: {
+                    Grammar: document.getElementById("grammar").value,
+                    Vocabulary: document.getElementById("vocabulary").value,
+                    Reading: document.getElementById("reading").value,
+                    Writing: document.getElementById("writing").value,
+                    Speaking: document.getElementById("speaking").value,
+                    Listening: document.getElementById("listening").value,
+                },
+                comments: document.getElementById("comments").value,
+            };
+
+            const response = await fetch('/generate-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${data.student || 'Student'}_Report.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    </script>
+</body>
+</html>
